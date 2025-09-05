@@ -1,0 +1,122 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+}
+
+header {
+  background: #cce5ff;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.totale {
+  text-align: center;
+  margin: 1rem;
+  font-size: 1.5rem;
+}
+
+.inizio-mese {
+  padding: 1rem;
+  background: #e0f7fa;
+}
+
+.inizio-mese button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  background-color: #00796b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.inizio-mese button:hover {
+  background-color: #004d40;
+}
+
+#conferma-budget {
+  margin-top: 1rem;
+  background-color: #28a745;
+  color: white;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#conferma-budget:hover {
+  background-color: #218838;
+}
+
+.categorie {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.categoria-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.categoria-card:hover {
+  transform: scale(1.05);
+}
+
+.categoria-card i {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.aggiungi-spesa {
+  padding: 1rem;
+  background: #e6f2ff;
+}
+
+.aggiungi-spesa h3 {
+  margin-top: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+form input, form select, form button {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+  .categorie {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
