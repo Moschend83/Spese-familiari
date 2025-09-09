@@ -26,7 +26,7 @@ function initApp() {
   };
 
   const SPREADSHEET_ID = "1Ip1KFSPv_iZBogt6A2D5-iEg-K9xZXLFK81xYZ1z4eU";
-  const CLIENT_ID      = "INSERISCI_IL_TUO_CLIENT_ID_WEB";
+  const CLIENT_ID      = "869733304794-uuomdn2i9cbr3u48j8ltthie5d5askdf.apps.googleusercontent.com";
 
   let token = null;
   const budgetCapitoli = {};
@@ -215,3 +215,4 @@ function initApp() {
     .catch(e => console.error("Errore inviaSpesa:", e));
   }
 }
+
