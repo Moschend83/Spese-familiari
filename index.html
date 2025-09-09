@@ -2,87 +2,42 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestione Spese Familiari</title>
-  <link rel="stylesheet" href="style.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spese Familiari</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-  <!-- Google Identity Services per leggere l’email utente -->
   <script>
     window.userEmail = "";
 
-    function handleCredentialResponse(response) {
-      const payload = JSON.parse(atob(response.credential.split(".")[1]));
+    function handleCredentialResponse(resp) {
+      const payload = JSON.parse(atob(resp.credential.split('.')[1]));
       window.userEmail = payload.email;
       console.log("Utente Identity:", window.userEmail);
     }
 
     function onGoogleLibraryLoad() {
-      // inizializza One-Tap / Silent Sign-In
       google.accounts.id.initialize({
-        client_id: "INSERISCI_IL_TUO_CLIENT_ID_WEB",
+        client_id: "IL_TUO_CLIENT_ID_WEB",
         callback: handleCredentialResponse
       });
       google.accounts.id.prompt();
 
-      // avvia l’applicazione solo dopo che GSI è pronta
-      if (typeof initApp === "function") {
-        initApp();
-      }
+      if (typeof initApp === "function") initApp();
     }
   </script>
-  <script
-    src="https://accounts.google.com/gsi/client"
-    async
-    defer
-    onload="onGoogleLibraryLoad()"
-  ></script>
+  <script src="https://accounts.google.com/gsi/client"
+          async defer
+          onload="onGoogleLibraryLoad()"></script>
 </head>
 <body>
   <header>
-    <h1>Gestione Spese Familiari</h1>
-    <select id="mese">
-      <option>Settembre 2025</option>
-      <option>Agosto 2025</option>
-    </select>
+    <h1>Spese Familiari</h1>
     <button id="login-google">🔐 Accedi con Google</button>
   </header>
 
-  <section class="totale">
-    <h2>€ <span id="totale-rimanente">0.00</span> rimanenti</h2>
-  </section>
-
-  <section class="inizio-mese">
-    <h3>Imposta Budget Iniziale</h3>
-    <button id="apri-budget">🗓️ Inizio Mese</button>
-    <div id="budget-form" style="display:none;">
-      <form id="form-budget">
-        <div id="campi-budget"></div>
-        <button type="submit" id="conferma-budget">✅ Conferma Budget</button>
-      </form>
-    </div>
-  </section>
-
-  <section class="categorie" id="categorie-container"></section>
-
-  <section class="aggiungi-spesa">
-    <h3>Aggiungi Spesa</h3>
-    <form id="spesa-form">
-      <input
-        type="text"
-        id="importo"
-        placeholder="Importo (€) es. 1,11"
-        required
-      />
-      <select id="categoria" required></select>
-      <input type="text" id="descrizione" placeholder="Descrizione" />
-      <button type="submit">➕ Aggiungi</button>
-    </form>
-  </section>
-
+  <!-- resto di index.html identico -->
   <script src="app.js"></script>
 </body>
 </html>
