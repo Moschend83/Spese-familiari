@@ -1,8 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const categorie = [
-    "Alimentari", "Gatti", "Auto", "Casa", "Beauty Martina", "Beauty Daniele",
-    "Shopping Martina", "Shopping Daniele", "Divertimento", "Farmacia/medico",
-    "Extra Martina", "Extra Daniele", "Regali", "Viaggi"
+    "Alimentari", "Gatti", "Auto", "Casa",
+    "Beauty Martina", "Beauty Daniele",
+    "Shopping Martina", "Shopping Daniele",
+    "Divertimento", "Farmacia/medico",
+    "Extra Martina", "Extra Daniele",
+    "Regali", "Viaggi"
   ];
 
   const icone = {
@@ -23,37 +26,41 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const SPREADSHEET_ID = "1Ip1KFSPv_iZBogt6A2D5-iEg-K9xZXLFK81xYZ1z4eU";
-  const CLIENT_ID = "869733304794-uuomdn2i9cbr3u48j8ltthie5d5askdf.apps.googleusercontent.com";
-  let token = null;
-
-  const totaleRimanente = document.getElementById("totale-rimanente");
-  const categorieContainer = document.getElementById("categorie-container");
-  const categoriaSelect = document.getElementById("categoria");
+  const CLIENT_ID      = "INSERISCI_IL_TUO_CLIENT_ID_WEB";
+  let token            = null;
   const budgetCapitoli = {};
 
-  // Autenticazione Google
-  document.getElementById("login-google").addEventListener("click", () => {
-    const tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: "https://www.googleapis.com/auth/spreadsheets",
-      callback: (response) => {
-        token = response.access_token;
-        alert("Accesso effettuato con successo!");
-        caricaBudgetDaSheet();
-      }
-    });
-    tokenClient.requestAccessToken();
+  const totaleRimanente    = document.getElementById("totale-rimanente");
+  const categorieContainer = document.getElementById("categorie-container");
+  const categoriaSelect    = document.getElementById("categoria");
+
+  // ‣ Inizializza tokenClient per Sheets API
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: "https://www.googleapis.com/auth/spreadsheets",
+    callback: resp => {
+      token = resp.access_token;
+      console.log("TOKEN ricevuto:", token);
+      caricaBudgetDaSheet();
+    }
   });
 
-  // Genera le card delle categorie
+  // ‣ Auto‐login all’apertura
+  tokenClient.requestAccessToken();
+
+  // ‣ Fallback: nuovo consenso su click
+  document.getElementById("login-google").addEventListener("click", () => {
+    tokenClient.requestAccessToken({ prompt: "consent" });
+  });
+
+  // ‣ Genera le card delle categorie + select
   categorie.forEach(cat => {
     const card = document.createElement("div");
     card.className = "categoria-card";
-    card.setAttribute("data-cat", cat);
     card.innerHTML = `
       <i class="${icone[cat]} fa-2x"></i><br>
       <strong>${cat}</strong><br>
-      € <span id="valore-${cat}">0</span>
+      € <span id="valore-${cat}">0.00</span>
     `;
     categorieContainer.appendChild(card);
 
@@ -63,117 +70,32 @@ document.addEventListener("DOMContentLoaded", () => {
     categoriaSelect.appendChild(option);
   });
 
-  // Mostra form per impostare budget
+  // ‣ Apri form Inizio Mese con prefill
   document.getElementById("apri-budget").addEventListener("click", () => {
-    const contenitoreCampi = document.getElementById("campi-budget");
-    contenitoreCampi.innerHTML = "";
+    const contenitore = document.getElementById("campi-budget");
+    contenitore.innerHTML = "";
     categorie.forEach(cat => {
       const input = document.createElement("input");
-      input.type = "number";
+      input.type        = "number";
+      input.step        = "0.01";
       input.placeholder = `Budget per ${cat}`;
-      input.name = cat;
-      input.required = true;
-      contenitoreCampi.appendChild(input);
+      input.name        = cat;
+      input.required    = true;
+      input.value       =
+        budgetCapitoli[cat] !== undefined
+          ? budgetCapitoli[cat].toFixed(2)
+          : "";
+      contenitore.appendChild(input);
     });
     document.getElementById("budget-form").style.display = "block";
   });
 
-  // Conferma budget iniziale
+  // ‣ Conferma Inizio Mese: somma + salva
   document.getElementById("form-budget").addEventListener("submit", e => {
     e.preventDefault();
-    let totale = 0;
+    let tot = 0;
     categorie.forEach(cat => {
-      const valore = parseFloat(e.target[cat].value) || 0;
-      budgetCapitoli[cat] = valore;
-      document.getElementById(`valore-${cat}`).textContent = valore.toFixed(2);
-      totale += valore;
-    });
-    totaleRimanente.textContent = totale.toFixed(2);
-    document.getElementById("budget-form").style.display = "none";
-    salvaBudgetSuSheet();
-  });
-
-  // Aggiunta spesa
-  document.getElementById("spesa-form").addEventListener("submit", e => {
-    e.preventDefault();
-    const importo = parseFloat(document.getElementById("importo").value);
-    const categoria = document.getElementById("categoria").value;
-    const descrizione = document.getElementById("descrizione").value;
-
-    const valoreSpan = document.getElementById(`valore-${categoria}`);
-    const attuale = parseFloat(valoreSpan.textContent) || 0;
-    const nuovoValore = attuale - importo;
-    valoreSpan.textContent = nuovoValore.toFixed(2);
-
-    const nuovoTotale = parseFloat(totaleRimanente.textContent) - importo;
-    totaleRimanente.textContent = nuovoTotale.toFixed(2);
-
-    inviaSpesaASheet(categoria, importo, descrizione);
-    document.getElementById("spesa-form").reset();
-  });
-
-  // Salva budget nel foglio "Budget"
-  function salvaBudgetSuSheet() {
-    const valori = categorie.map(cat => [cat, budgetCapitoli[cat] || 0]);
-    const body = { values: valori };
-
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Budget!A2:B${valori.length + 1}?valueInputOption=USER_ENTERED`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    })
-    .then(res => res.json())
-    .then(data => console.log("Budget salvato!", data))
-    .catch(err => console.error("Errore salvataggio budget:", err));
-  }
-
-  // Carica budget dal foglio "Budget"
-  function caricaBudgetDaSheet() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Budget!A2:B`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      let totale = 0;
-      data.values.forEach(([categoria, valore]) => {
-        const importo = parseFloat(valore) || 0;
-        budgetCapitoli[categoria] = importo;
-        const span = document.getElementById(`valore-${categoria}`);
-        if (span) span.textContent = importo.toFixed(2);
-        totale += importo;
-      });
-      totaleRimanente.textContent = totale.toFixed(2);
-    })
-    .catch(err => console.error("Errore caricamento budget:", err));
-  }
-
-  // Invio spesa a Google Sheets
-  function inviaSpesaASheet(categoria, importo, descrizione) {
-    if (!token) {
-      alert("Devi accedere con Google prima di salvare.");
-      return;
-    }
-
-    const body = {
-      values: [[new Date().toLocaleDateString(), categoria, importo, descrizione]]
-    };
-
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/Spese!A1:append?valueInputOption=USER_ENTERED`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    })
-    .then(res => res.json())
-    .then(data => console.log("Spesa salvata!", data))
-    .catch(err => console.error("Errore:", err));
-  }
-});
+      const aggiunta  = parseFloat(e.target[cat].value) || 0;
+      const precedente = budgetCapitoli[cat] || 0;
+      const aggiornato = precedente + aggiunta;
+     
