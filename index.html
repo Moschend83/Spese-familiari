@@ -5,17 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Spese Familiari</title>
   <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
 
   <!-- Google Identity Services -->
   <script>
     window.userEmail = "";
-    function handleCredentialResponse(resp) {
-      const pl = JSON.parse(atob(resp.credential.split('.')[1]));
-      window.userEmail = pl.email;
+
+    function handleCredentialResponse(response) {
+      const payload = JSON.parse(atob(response.credential.split(".")[1]));
+      window.userEmail = payload.email;
       console.log("Identity email:", window.userEmail);
     }
+
     function onGoogleLibraryLoad() {
       google.accounts.id.initialize({
         client_id: "TUO_CLIENT_ID_WEB",
@@ -26,10 +30,11 @@
       // non chiamiamo prompt() qui: lo faremo su click
     }
   </script>
-  <script src="https://accounts.google.com/gsi/client"
-          async defer
-          onload="onGoogleLibraryLoad()">
-  </script>
+  <script
+    src="https://accounts.google.com/gsi/client"
+    async defer
+    onload="onGoogleLibraryLoad()"
+  ></script>
 </head>
 <body>
   <header>
@@ -47,7 +52,7 @@
     <div id="budget-form" style="display:none;">
       <form id="form-budget">
         <div id="campi-budget"></div>
-        <button type="submit" id="conferma-budget">✅ Conferma Budget</button>
+        <button type="submit">✅ Conferma Budget</button>
       </form>
     </div>
   </section>
@@ -57,14 +62,18 @@
   <section class="aggiungi-spesa">
     <h3>Aggiungi Spesa</h3>
     <form id="spesa-form">
-      <input type="text"
-             id="importo"
-             placeholder="Importo (€) es. 1,11"
-             required/>
+      <input
+        type="text"
+        id="importo"
+        placeholder="Importo (€) es. 1,11"
+        required
+      />
       <select id="categoria" required></select>
-      <input type="text"
-             id="descrizione"
-             placeholder="Descrizione" />
+      <input
+        type="text"
+        id="descrizione"
+        placeholder="Descrizione"
+      />
       <button type="submit">➕ Aggiungi</button>
     </form>
   </section>
