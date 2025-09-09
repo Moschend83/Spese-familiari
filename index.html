@@ -10,9 +10,8 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
 
-  <!-- Google Identity Services -->
+  <!-- Google Identity Services per leggere l’email utente -->
   <script>
-    // Salvo l'email dell'utente dopo il login Google Identity
     window.userEmail = "";
 
     function handleCredentialResponse(response) {
@@ -21,17 +20,18 @@
       console.log("Utente Identity:", window.userEmail);
     }
 
-    // Questa funzione viene chiamata quando gsi/client è caricato
     function onGoogleLibraryLoad() {
-      // 1) Identity (id_token) per leggere userEmail
+      // inizializza One-Tap / Silent Sign-In
       google.accounts.id.initialize({
         client_id: "INSERISCI_IL_TUO_CLIENT_ID_WEB",
         callback: handleCredentialResponse
       });
       google.accounts.id.prompt();
 
-      // 2) Avvio l’app solo dopo che la libreria Google è pronta
-      initApp();
+      // avvia l’applicazione solo dopo che GSI è pronta
+      if (typeof initApp === "function") {
+        initApp();
+      }
     }
   </script>
   <script
