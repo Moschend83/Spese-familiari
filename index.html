@@ -10,22 +10,28 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
 
-  <!-- Script per ottenere l’id_token con l’email dell’utente -->
+  <!-- Google Identity Services -->
   <script>
+    // Salvo l'email dell'utente dopo il login Google Identity
+    window.userEmail = "";
+
     function handleCredentialResponse(response) {
-      const payload = JSON.parse(
-        atob(response.credential.split(".")[1])
-      );
+      const payload = JSON.parse(atob(response.credential.split(".")[1]));
       window.userEmail = payload.email;
-      console.log("Utente:", window.userEmail);
+      console.log("Utente Identity:", window.userEmail);
     }
 
+    // Questa funzione viene chiamata quando gsi/client è caricato
     function onGoogleLibraryLoad() {
+      // 1) Identity (id_token) per leggere userEmail
       google.accounts.id.initialize({
         client_id: "INSERISCI_IL_TUO_CLIENT_ID_WEB",
         callback: handleCredentialResponse
       });
-      google.accounts.id.prompt(); // avvia silent sign-in o popup
+      google.accounts.id.prompt();
+
+      // 2) Avvio l’app solo dopo che la libreria Google è pronta
+      initApp();
     }
   </script>
   <script
