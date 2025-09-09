@@ -11,25 +11,19 @@
   <!-- Google Identity Services -->
   <script>
     window.userEmail = "";
-
-    function handleCredentialResponse(response) {
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      window.userEmail = payload.email;
+    function handleCredentialResponse(resp) {
+      const pl = JSON.parse(atob(resp.credential.split('.')[1]));
+      window.userEmail = pl.email;
       console.log("Identity email:", window.userEmail);
     }
-
     function onGoogleLibraryLoad() {
-      // 1) inizializzo One-Tap ma disabilito l’auto-login
       google.accounts.id.initialize({
         client_id: "TUO_CLIENT_ID_WEB",
         callback: handleCredentialResponse,
-        auto_select: false,              // disattiva il “silent sign-in”
+        auto_select: false,
         cancel_on_tap_outside: true
       });
-      // NON chiamo più prompt() qui
-
-      // 2) avvio initApp per montare l’app
-      if (typeof initApp === "function") initApp();
+      // non chiamiamo prompt() qui: lo faremo su click
     }
   </script>
   <script src="https://accounts.google.com/gsi/client"
@@ -43,8 +37,38 @@
     <button id="login-google">🔐 Accedi con Google</button>
   </header>
 
-  <!-- resto della pagina invariato… -->
+  <section class="totale">
+    <h2>€ <span id="totale-rimanente">0.00</span> rimanenti</h2>
+  </section>
 
-  <script src="app.js"></script>
+  <section class="inizio-mese">
+    <h3>Imposta Budget Iniziale</h3>
+    <button id="apri-budget">🗓️ Inizio Mese</button>
+    <div id="budget-form" style="display:none;">
+      <form id="form-budget">
+        <div id="campi-budget"></div>
+        <button type="submit" id="conferma-budget">✅ Conferma Budget</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="categorie" id="categorie-container"></section>
+
+  <section class="aggiungi-spesa">
+    <h3>Aggiungi Spesa</h3>
+    <form id="spesa-form">
+      <input type="text"
+             id="importo"
+             placeholder="Importo (€) es. 1,11"
+             required/>
+      <select id="categoria" required></select>
+      <input type="text"
+             id="descrizione"
+             placeholder="Descrizione" />
+      <button type="submit">➕ Aggiungi</button>
+    </form>
+  </section>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
