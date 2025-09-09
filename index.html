@@ -2,42 +2,66 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Spese Familiari</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
+  <!-- Google Identity Services (One-Tap per catturare l’email) -->
   <script>
     window.userEmail = "";
-
     function handleCredentialResponse(resp) {
-      const payload = JSON.parse(atob(resp.credential.split('.')[1]));
-      window.userEmail = payload.email;
-      console.log("Utente Identity:", window.userEmail);
+      const pl = JSON.parse(atob(resp.credential.split('.')[1]));
+      window.userEmail = pl.email;
+      console.log("Identity email:", window.userEmail);
     }
-
     function onGoogleLibraryLoad() {
       google.accounts.id.initialize({
-        client_id: "IL_TUO_CLIENT_ID_WEB",
+        client_id: "TUO_CLIENT_ID_WEB",  
         callback: handleCredentialResponse
       });
-      google.accounts.id.prompt();
-
+      google.accounts.id.prompt();  
       if (typeof initApp === "function") initApp();
     }
   </script>
   <script src="https://accounts.google.com/gsi/client"
           async defer
-          onload="onGoogleLibraryLoad()"></script>
+          onload="onGoogleLibraryLoad()">
+  </script>
 </head>
 <body>
   <header>
     <h1>Spese Familiari</h1>
-    <button id="login-google">🔐 Accedi con Google</button>
+    <button id="login-google">🔐 Login Google</button>
   </header>
 
-  <!-- resto di index.html identico -->
+  <section class="totale">
+    € <span id="totale-rimanente">0.00</span> rimanenti
+  </section>
+
+  <section class="inizio-mese">
+    <button id="apri-budget">🗓️ Inizio Mese</button>
+    <div id="budget-form" style="display:none;">
+      <form id="form-budget"><div id="campi-budget"></div>
+        <button type="submit">✅ Conferma Budget</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="categorie-container" class="categorie"></section>
+
+  <section class="aggiungi-spesa">
+    <form id="spesa-form">
+      <input type="text" id="importo"
+             placeholder="Importo (€) es. 1,11" required/>
+      <select id="categoria" required></select>
+      <input type="text" id="descrizione"
+             placeholder="Descrizione"/>
+      <button type="submit">➕ Aggiungi</button>
+    </form>
+  </section>
+
   <script src="app.js"></script>
 </body>
 </html>
